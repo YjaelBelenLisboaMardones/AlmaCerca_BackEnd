@@ -1,3 +1,5 @@
+// [EN TU ARCHIVO SecurityConfig.java EN EL BACKEND]
+
 package com.almacerca.backend.config;
 
 import org.springframework.context.annotation.Bean;
@@ -8,34 +10,36 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+// Importación necesaria para especificar el método HTTP
+import org.springframework.http.HttpMethod; 
 
 @Configuration
-@EnableWebSecurity // Habilita la configuración de seguridad de Spring
+@EnableWebSecurity
 public class SecurityConfig {
 
-    // 🔥 1. BEAN PARA EL DECODIFICADOR DE CONTRASEÑAS
-    // Esto soluciona el error "Credenciales inválidas" al loguear.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. CADENA DE FILTROS (Control de accesos y rutas)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Deshabilita CSRF (necesario para APIs que no usan sesiones de navegador)
             .csrf(csrf -> csrf.disable())
-            
-            // Configura la aplicación como REST (sin estado/tokens)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // Define las reglas de acceso por ruta
             .authorizeHttpRequests(auth -> auth
-                // 🔥 RUTA CORREGIDA: Agregamos /api/admin/products para acceso público
-                .requestMatchers("/api/auth/**", "/api/products", "/api/admin/products").permitAll() 
+                // 🔥 Rutas públicas necesarias: Login, Registro, Listar Productos (catálogo)
+                .requestMatchers("/api/auth/**", "/api/products").permitAll() 
                 
-                // Todas las demás rutas requieren autenticación (token)
+                // 🔑 SOLUCIÓN AL ERROR 403: Permitir POST al endpoint de creación de admin.
+                // Esto permite que el Frontend pueda enviar el producto sin token JWT.
+                .requestMatchers(HttpMethod.POST, "/api/admin/products").permitAll() // ⬅️ CAMBIO CLAVE
+                
+                // Además, si el endpoint de CATEGORÍAS también es público:
+                .requestMatchers("/api/products/category/**").permitAll()
+                
+                // Todas las demás rutas (Admin CRUD aparte del POST, Carrito, etc.) requieren autenticación
                 .anyRequest().authenticated()
             );
 
