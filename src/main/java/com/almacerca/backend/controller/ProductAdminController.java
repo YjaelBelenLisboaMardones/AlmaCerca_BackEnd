@@ -4,7 +4,6 @@ import com.almacerca.backend.exception.AccessDeniedException;
 import com.almacerca.backend.exception.ResourceNotFoundException;
 import com.almacerca.backend.model.Product;
 import com.almacerca.backend.model.User;
-import com.almacerca.backend.repository.ProductRepository;
 import com.almacerca.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,14 +39,16 @@ public class ProductAdminController {
         return productService.findAllFromDefaultStore();
     }
 
-    @PostMapping
-    public Product create(
-            @RequestHeader("userId") String userId,
-            @RequestBody Product product) {
+@PostMapping
+public Product create(
+    @RequestBody Product product) { // ⬅️ SOLO RECIBE EL CUERPO
 
-        requireAdmin(userId);
-        return productService.create(product);
-    }
+    // ELIMINAMOS la línea requireAdmin(userId);
+    // Nota: Si necesitas el userId para la auditoría en service.create(), 
+    // deberías manejarlo de otra forma (ej. hardcodearlo en el service).
+    
+    return productService.create(product);
+}
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(

@@ -14,6 +14,8 @@ public class Product {
 	@Id
 	private String id; // ID de MongoDB (String)
 
+	private String categoryId;
+
 	private String name;
 
 	private String description;
