@@ -26,7 +26,7 @@ public class AuthService {
 		u.setEmail(request.getEmail());
 		// NOTA: Usar BCryptPasswordEncoder aquí es una mejor práctica para producción.
 		u.setPassword(request.getPassword()); 
-		u.setRole("BUYER");
+		u.setRole(request.getRole());
 		return userRepository.save(u);
 	}
 
