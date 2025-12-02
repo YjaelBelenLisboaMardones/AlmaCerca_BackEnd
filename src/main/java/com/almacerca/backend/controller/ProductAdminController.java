@@ -9,18 +9,20 @@ import com.almacerca.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.almacerca.backend.service.ProductService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/admin/products")
 public class ProductAdminController {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductService productService;
+
 
     //userId ahora es String
     private User requireAdmin(String userId) {
@@ -35,20 +37,18 @@ public class ProductAdminController {
     //PÚBLICO
     @GetMapping
     public List<Product> getAll() {
-        return productRepository.findAll();
+        return productService.findAllFromDefaultStore();
     }
 
-    //SOLO ADMIN
     @PostMapping
     public Product create(
             @RequestHeader("userId") String userId,
             @RequestBody Product product) {
 
         requireAdmin(userId);
-        return productRepository.save(product);
+        return productService.create(product);
     }
 
-    //SOLO ADMIN
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(
             @RequestHeader("userId") String userId,
@@ -56,30 +56,17 @@ public class ProductAdminController {
             @RequestBody Product updated) {
 
         requireAdmin(userId);
-
-        Product p = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-
-        p.setName(updated.getName());
-        p.setDescription(updated.getDescription());
-        p.setPrice(updated.getPrice());
-
-        productRepository.save(p);
+        Product p = productService.update(id, updated);
         return ResponseEntity.ok(p);
     }
 
-    //SOLO ADMIN
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @RequestHeader("userId") String userId,
             @PathVariable String id) {
 
         requireAdmin(userId);
-
-        Product p = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-
-        productRepository.delete(p);
+        productService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
