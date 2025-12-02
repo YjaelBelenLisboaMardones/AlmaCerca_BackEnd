@@ -32,10 +32,10 @@ public class SecurityConfig {
             
             // Define las reglas de acceso por ruta
             .authorizeHttpRequests(auth -> auth
-                // 🔥 Rutas públicas necesarias: Login, Registro, Listar Productos (tu catálogo)
-                .requestMatchers("/api/auth/**", "/api/products").permitAll() 
+                // 🔥 RUTA CORREGIDA: Agregamos /api/admin/products para acceso público
+                .requestMatchers("/api/auth/**", "/api/products", "/api/admin/products").permitAll() 
                 
-                // Todas las demás rutas (Carrito, Admin, etc.) requieren autenticación (token)
+                // Todas las demás rutas requieren autenticación (token)
                 .anyRequest().authenticated()
             );
 
