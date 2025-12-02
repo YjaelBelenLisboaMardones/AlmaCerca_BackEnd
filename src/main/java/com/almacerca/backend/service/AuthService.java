@@ -22,6 +22,7 @@ public class AuthService {
 			throw new RuntimeException("User already exists");
 		}
 		User u = new User();
+		u.setName(request.getName());
 		u.setEmail(request.getEmail());
 		// NOTA: Usar BCryptPasswordEncoder aquí es una mejor práctica para producción.
 		u.setPassword(request.getPassword()); 
