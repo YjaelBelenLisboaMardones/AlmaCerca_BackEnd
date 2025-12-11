@@ -1,10 +1,6 @@
 package com.almacerca.backend.controller;
 
-import com.almacerca.backend.exception.AccessDeniedException;
-import com.almacerca.backend.exception.ResourceNotFoundException;
 import com.almacerca.backend.model.Product;
-import com.almacerca.backend.model.User;
-import com.almacerca.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,23 +13,8 @@ import java.util.List;
 public class ProductAdminController {
 
     @Autowired
-    private UserRepository userRepository;
+    private ProductService productService; 
 
-    @Autowired
-    private ProductService productService;
-
-
-    //userId ahora es String
-    private User requireAdmin(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (!"ADMIN".equals(user.getRole())) {
-            throw new AccessDeniedException("Admin role required");
-        }
-        return user;
-    }
-
-    //PÚBLICO
     @GetMapping
     public List<Product> getAll() {
         return productService.findAllFromDefaultStore();
@@ -41,28 +22,21 @@ public class ProductAdminController {
 
     @PostMapping
     public Product create(
-        @RequestBody Product product) { // ⬅️ SOLO RECIBE EL CUERPO
-    
-        // ELIMINAMOS la línea requireAdmin(userId);
-        // Nota: Si necesitas el userId para la auditoría en service.create(), 
-        // deberías manejarlo de otra forma (ej. hardcodearlo en el service).
-        
+            @RequestBody Product product) {
         return productService.create(product);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(
-        @PathVariable("id") String id,
-        @RequestBody Product updated) {
-
+            @PathVariable String id,
+            @RequestBody Product updated) {
         Product p = productService.update(id, updated);
         return ResponseEntity.ok(p);
     }
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Void> delete(
-        @PathVariable("id") String id) {
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable String id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
