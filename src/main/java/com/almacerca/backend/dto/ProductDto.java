@@ -13,4 +13,8 @@ public class ProductDto {
     private String name;
     private String description;
     private Double price;
+    private String storeId;
+    private String categoryId;
+    private Integer stock; // <- ¡REQUERIDO!
+    private String imageUrl; // <- ¡REQUERIDO!
 }

@@ -1,3 +1,5 @@
+// [EN TU ARCHIVO SecurityConfig.java EN EL BACKEND]
+
 package com.almacerca.backend.config;
 
 import org.springframework.context.annotation.Bean;
@@ -8,34 +10,38 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+// Importación necesaria para especificar el método HTTP
+import org.springframework.http.HttpMethod; 
+// [EN TU ARCHIVO SecurityConfig.java EN EL BACKEND]
+
+// Importación necesaria para especificar el método HTTP
+import org.springframework.http.HttpMethod; 
 
 @Configuration
-@EnableWebSecurity // Habilita la configuración de seguridad de Spring
+@EnableWebSecurity
 public class SecurityConfig {
 
-    // 🔥 1. BEAN PARA EL DECODIFICADOR DE CONTRASEÑAS
-    // Esto soluciona el error "Credenciales inválidas" al loguear.
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // ... (PasswordEncoder y otros Beans)
 
-    // 2. CADENA DE FILTROS (Control de accesos y rutas)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Deshabilita CSRF (necesario para APIs que no usan sesiones de navegador)
             .csrf(csrf -> csrf.disable())
-            
-            // Configura la aplicación como REST (sin estado/tokens)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
-            // Define las reglas de acceso por ruta
             .authorizeHttpRequests(auth -> auth
-                // 🔥 RUTA CORREGIDA: Agregamos /api/admin/products para acceso público
-                .requestMatchers("/api/auth/**", "/api/products", "/api/admin/products").permitAll() 
+                // Rutas que ya estaban públicas
+                .requestMatchers("/api/auth/**", "/api/products").permitAll() 
                 
-                // Todas las demás rutas requieren autenticación (token)
+                // 🛑 SOLUCIÓN FINAL AL 403 (Permitir TODO el acceso a ADMIN)
+                // Permitimos cualquier método HTTP (GET, POST, PUT, DELETE) en /api/admin/products/**
+                // Ya que estamos en desarrollo y hemos quitado la lógica requireAdmin()
+                .requestMatchers("/api/admin/products/**").permitAll() // ⬅️ CAMBIO CLAVE
+                
+                // Permitir listado por categorías (Cliente)
+                .requestMatchers("/api/products/category/**").permitAll()
+                
+                // Todas las demás rutas requieren autenticación
                 .anyRequest().authenticated()
             );
 

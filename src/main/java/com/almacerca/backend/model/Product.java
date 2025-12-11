@@ -13,14 +13,11 @@ public class Product {
 
 	@Id
 	private String id; // ID de MongoDB (String)
-
-	private String name;
-
 	private String description;
-
+	private String name;
 	private Double price;
-
     private String storeId;
+	private String categoryId;
     private Integer stock;
     private String imageUrl;
 }

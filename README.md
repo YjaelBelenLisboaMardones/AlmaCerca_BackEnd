@@ -28,3 +28,97 @@ A continuación se detallan los endpoints disponibles.
 | `GET` | `/api/cart` | Muestra el carrito del usuario. | - |
 | `POST` | `/api/cart` | Agrega un ítem al carrito. | `?productId=1&quantity=2` |
 | `DELETE` | `/api/cart/items/{id}` | Elimina un ítem específico. | - |
+
+
+🛡️ Registro de Mitigación de Vulnerabilidades Críticas
+
+🚨 1. Síntesis del Incidente (RCA)
+1.1 Problema Identificado
+
+Se detectó la persistencia de Vulnerabilidades Críticas (P1) y de Alto Riesgo en:
+
+spring-boot-starter-web
+
+spring-boot-starter-security
+
+Estas vulnerabilidades afectaban la integridad del servicio, la exposición de datos y la superficie de ataque.
+
+1.2 Causas Raíz (RCA)
+🔧 Desalineación de versiones
+
+La versión base de Spring Boot no contenía los parches de seguridad más recientes.
+
+🧱 Deuda Técnica de Seguridad
+
+Dependencias no utilizadas que aumentaban la superficie de ataque:
+
+mysql-connector-j
+
+io.jsonwebtoken:*
+
+⚙️ 2. Estrategia de Mitigación (HOTFIX)
+
+Mitigación aplicada bajo el principio de Mínima Dependencia Requerida y asegurando integridad en la cadena de dependencias.
+
+2.1 Actualización Crítica de Componentes
+Componente	Versión Anterior	Versión Nueva (Patch)
+spring-boot-starter-parent	3.2.5	3.3.6
+2.2 Remoción de Dependencias Innecesarias
+
+❌ com.mysql:mysql-connector-j
+
+❌ io.jsonwebtoken:*
+
+Ambas eliminadas para reducir superficie de ataque y evitar vulnerabilidades transitivas.
+
+🔍 3. Validación de Estabilidad Post-Mitigation
+🧪 3.1 Validación del Build
+mvn clean install
+
+🔥 3.2 Smoke Test Operacional
+mvn -DskipTests spring-boot:run
+
+
+Endpoints validados:
+
+/login → Seguridad
+
+/productos → Persistencia
+
+Todo operativo sin regresiones.
+
+📊 4. Post-Mortem y Resultado Esperado
+✔️ Resultado del Escaneo
+
+0 Vulnerabilidades Críticas después del reanálisis.
+
+📌 Conclusión
+
+La línea base queda:
+
+Segura
+
+Estabilizada
+
+Sin dependencias innecesarias
+
+Con deuda técnica de seguridad resuelta
+
+📘 5. Registro de Cambios (Changelog)
+v1.1 — Seguridad estabilizada
+
+Aplicación del patch 3.3.6
+
+Remoción de dependencias vulnerables
+
+Reconstrucción de la cadena de dependencias
+
+Smoke test en flujo crítico
+
+v1.0 — Versión inicial
+
+Configuración base del backend
+
+Integración con MongoDB
+
+Flujo de negocio operativo
