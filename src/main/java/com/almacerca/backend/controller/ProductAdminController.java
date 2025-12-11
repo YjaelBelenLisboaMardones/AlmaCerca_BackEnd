@@ -39,34 +39,30 @@ public class ProductAdminController {
         return productService.findAllFromDefaultStore();
     }
 
-@PostMapping
-public Product create(
-    @RequestBody Product product) { // ⬅️ SOLO RECIBE EL CUERPO
-
-    // ELIMINAMOS la línea requireAdmin(userId);
-    // Nota: Si necesitas el userId para la auditoría en service.create(), 
-    // deberías manejarlo de otra forma (ej. hardcodearlo en el service).
+    @PostMapping
+    public Product create(
+        @RequestBody Product product) { // ⬅️ SOLO RECIBE EL CUERPO
     
-    return productService.create(product);
-}
+        // ELIMINAMOS la línea requireAdmin(userId);
+        // Nota: Si necesitas el userId para la auditoría en service.create(), 
+        // deberías manejarlo de otra forma (ej. hardcodearlo en el service).
+        
+        return productService.create(product);
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(
-            @RequestHeader("userId") String userId,
-            @PathVariable String id,
-            @RequestBody Product updated) {
+        @PathVariable("id") String id,
+        @RequestBody Product updated) {
 
-        requireAdmin(userId);
         Product p = productService.update(id, updated);
         return ResponseEntity.ok(p);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @RequestHeader("userId") String userId,
-            @PathVariable String id) {
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> delete(
+        @PathVariable("id") String id) {
 
-        requireAdmin(userId);
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
