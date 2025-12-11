@@ -3,6 +3,9 @@ package com.almacerca.backend.service;
 import com.almacerca.backend.exception.ResourceNotFoundException;
 import com.almacerca.backend.model.Product;
 import com.almacerca.backend.repository.ProductRepository;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.almacerca.backend.config.StoreConstants;
@@ -16,6 +19,9 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     public List<Product> findAllFromDefaultStore() {
         return productRepository.findByStoreId(StoreConstants.DEFAULT_STORE_ID);
@@ -41,6 +47,24 @@ public class ProductService {
         p.setDescription(updated.getDescription());
         p.setPrice(updated.getPrice());
         return productRepository.save(p);
+    }
+
+    // Buscar productos por categoría. Soporta categoryId almacenado como String o como número en MongoDB.
+    public List<Product> findByCategoryId(String categoryId) {
+        // Intentamos una consulta flexible que acepte tanto String como Number en el campo categoryId.
+        Query q = new Query();
+        try {
+            // si categoryId es numérico, añadimos ambas condiciones
+            Integer asInt = Integer.valueOf(categoryId);
+            q.addCriteria(new Criteria().orOperator(
+                    Criteria.where("categoryId").is(categoryId),
+                    Criteria.where("categoryId").is(asInt)
+            ));
+        } catch (NumberFormatException ex) {
+            // no es numérico, buscamos por string
+            q.addCriteria(Criteria.where("categoryId").is(categoryId));
+        }
+        return mongoTemplate.find(q, Product.class);
     }
 
     //id ahora es String

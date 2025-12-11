@@ -61,7 +61,7 @@ public class CartController {
 			//userId es String
 			@RequestHeader("userId") String userId, 
 			//productId en la URL es String
-			@PathVariable String productId) {
+			@PathVariable("productId") String productId) {
 		
 		requireBuyer(userId);
 		//Llamada al servicio con String IDs

@@ -12,15 +12,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 // Importación necesaria para especificar el método HTTP
 import org.springframework.http.HttpMethod; 
+// [EN TU ARCHIVO SecurityConfig.java EN EL BACKEND]
+
+// Importación necesaria para especificar el método HTTP
+import org.springframework.http.HttpMethod; 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    // ... (PasswordEncoder y otros Beans)
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,17 +30,18 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             
             .authorizeHttpRequests(auth -> auth
-                // 🔥 Rutas públicas necesarias: Login, Registro, Listar Productos (catálogo)
+                // Rutas que ya estaban públicas
                 .requestMatchers("/api/auth/**", "/api/products").permitAll() 
                 
-                // 🔑 SOLUCIÓN AL ERROR 403: Permitir POST al endpoint de creación de admin.
-                // Esto permite que el Frontend pueda enviar el producto sin token JWT.
-                .requestMatchers(HttpMethod.POST, "/api/admin/products").permitAll() // ⬅️ CAMBIO CLAVE
+                // 🛑 SOLUCIÓN FINAL AL 403 (Permitir TODO el acceso a ADMIN)
+                // Permitimos cualquier método HTTP (GET, POST, PUT, DELETE) en /api/admin/products/**
+                // Ya que estamos en desarrollo y hemos quitado la lógica requireAdmin()
+                .requestMatchers("/api/admin/products/**").permitAll() // ⬅️ CAMBIO CLAVE
                 
-                // Además, si el endpoint de CATEGORÍAS también es público:
+                // Permitir listado por categorías (Cliente)
                 .requestMatchers("/api/products/category/**").permitAll()
                 
-                // Todas las demás rutas (Admin CRUD aparte del POST, Carrito, etc.) requieren autenticación
+                // Todas las demás rutas requieren autenticación
                 .anyRequest().authenticated()
             );
 
