@@ -16,27 +16,30 @@ public class ProductAdminController {
     private ProductService productService; 
 
     @GetMapping
-    public List<Product> getAll() {
-        return productService.findAllFromDefaultStore();
+    public ResponseEntity<List<Product>> getAll(@RequestHeader("userId") String userId) {
+    
+        //return productService.findAllFromDefaultStore();
+        System.out.println("Solicitud realizada por el admin: " + userId); // Log temporal
+        return ResponseEntity.ok(productService.findAllFromDefaultStore());
     }
 
     @PostMapping
     public Product create(
-            @RequestBody Product product) {
+        @RequestBody Product product) {
         return productService.create(product);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(
-            @PathVariable String id,
-            @RequestBody Product updated) {
+        @PathVariable String id,
+        @RequestBody Product updated) {
         Product p = productService.update(id, updated);
         return ResponseEntity.ok(p);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable String id) {
+        @PathVariable String id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }

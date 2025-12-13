@@ -31,12 +31,15 @@ public class SecurityConfig {
             
             .authorizeHttpRequests(auth -> auth
                 // Rutas que ya estaban públicas
-                .requestMatchers("/api/auth/**", "/api/products").permitAll() 
+                .requestMatchers("/api/auth/**", "/api/products/**").permitAll() 
                 
                 // 🛑 SOLUCIÓN FINAL AL 403 (Permitir TODO el acceso a ADMIN)
                 // Permitimos cualquier método HTTP (GET, POST, PUT, DELETE) en /api/admin/products/**
                 // Ya que estamos en desarrollo y hemos quitado la lógica requireAdmin()
                 .requestMatchers("/api/admin/products/**").permitAll() // ⬅️ CAMBIO CLAVE
+
+                // Rutas de carrito públicas; la validación se hace con el header userId en el controlador
+                .requestMatchers("/api/cart/**").permitAll()
                 
                 // Permitir listado por categorías (Cliente)
                 .requestMatchers("/api/products/category/**").permitAll()

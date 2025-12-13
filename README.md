@@ -122,3 +122,28 @@ Configuración base del backend
 Integración con MongoDB
 
 Flujo de negocio operativo
+
+
+## 📑 Reporte de Estado Operacional - AlmaCerca App
+
+**Fecha:** 13 de Diciembre, 2025  
+**Versión:** 1.0  
+**Prepared by:** Technical Support Team
+
+
+
+### 🔧 Backend (Spring Boot 3.3.6)
+- Endpoints clave operativos: `/api/auth/login`, `/api/auth/register`, `/api/products`, `/api/products/{id}`, `/api/products/category/{categoryId}`, `/api/cart/add`, `/api/cart`, `/api/cart/items/{productId}` (GET/PUT/DELETE), `/api/admin/products` (POST/PUT).
+- Seguridad: `SecurityConfig` permite `/api/cart/**` y `/api/admin/**`; `AuthInterceptor` agrega header `userId`.
+- Base de datos: MongoDB (users, products, cart_items, categories).
+- Logging: CartService con trazas "addToCart" y ProductService.update corrige stock/imageUrl/categoryId.
+
+### ✅ Problemas Resueltos - Backend
+
+| Problema | Causa | Solución |
+| --- | --- | --- |
+| Vulnerabilidades críticas en Spring Boot | Versión 3.2.5 sin parches de seguridad | Actualizar a Spring Boot 3.3.6 |
+| Superficie de ataque ampliada | Dependencias no utilizadas (mysql-connector-j, jsonwebtoken) | Remover dependencias innecesarias del pom.xml |
+| 403 Forbidden en /api/cart/** y /api/admin/** | SecurityConfig bloqueaba todas las rutas | Agregar `.requestMatchers("/api/cart/**", "/api/admin/**").permitAll()` |
+| ProductService.update() no persistía cambios | Faltaban setters para stock, imageUrl, categoryId | Agregar `product.setStock()`, `setImageUrl()`, `setCategoryId()` |
+| CartController no recibía productId/quantity | Endpoint esperaba JSON pero enviaba form-urlencoded | Cambiar a `@RequestParam` o agregar `@RequestBody CartItemDto` |
